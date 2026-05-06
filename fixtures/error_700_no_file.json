@@ -1,0 +1,14 @@
+{
+  "status": "error",
+  "error": {
+    "error_code": 700,
+    "error_message": "Recognition failed: you haven't sent a file via POST or a file URL in the `url` parameter. If you sent the request by POST, please check the protocol you're using: the URL should start with https:// (http:// requests get redirected to https and we don't receive any data from you) and that your Content-Type header equals to `multipart/form-data`."
+  },
+  "request_params": {
+    "api_token": "d***e"
+  },
+  "request_api_method": "recognize",
+  "request_http_method": "POST",
+  "see api documentation": "https://docs.audd.io",
+  "contact us": "api@audd.io"
+}

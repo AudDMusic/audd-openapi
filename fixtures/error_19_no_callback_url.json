@@ -1,0 +1,14 @@
+{
+  "status": "error",
+  "error": {
+    "error_code": 19,
+    "error_message": "Getting the URL for callbacks failed: Internal error."
+  },
+  "request_params": {
+    "api_token": "d***e"
+  },
+  "request_api_method": "getCallbackUrl",
+  "request_http_method": "POST",
+  "see api documentation": "https://docs.audd.io",
+  "contact us": "api@audd.io"
+}
