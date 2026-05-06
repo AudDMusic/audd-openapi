@@ -1,0 +1,1224 @@
+openapi: 3.1.0
+
+info:
+  title: AudD Music Recognition API
+  version: 1.4.4
+  description: |
+    The AudD music recognition API identifies songs from short audio clips
+    (`api.audd.io/`), large audio/video files (`enterprise.audd.io/`), and
+    real-time audio streams (callback or longpoll based on `api.audd.io/`).
+
+    This OpenAPI document is the canonical contract for the API. Every
+    official AudD SDK validates its parser against the fixtures shipped
+    alongside this spec.
+
+    Documentation: https://docs.audd.io
+    Get an api_token: https://dashboard.audd.io
+    Support: api@audd.io
+  contact:
+    name: AudD API Support
+    email: api@audd.io
+    url: https://audd.io
+  license:
+    name: MIT
+    identifier: MIT
+
+servers:
+  - url: https://api.audd.io
+    description: Standard recognition, streams, custom catalog, and lyrics endpoints.
+  - url: https://enterprise.audd.io
+    description: Enterprise large-file recognition endpoint.
+
+security:
+  - api_token_form: []
+  - api_token_query: []
+
+components:
+  securitySchemes:
+    api_token_form:
+      type: apiKey
+      in: header
+      name: api_token
+      description: |
+        AudD authentication uses the `api_token` parameter sent either as a
+        multipart/form-data field (POST) or as a query parameter (GET/POST).
+        OpenAPI 3.1 has no first-class scheme for "auth in request body"; this
+        entry documents the parameter for code generators that recognize it.
+    api_token_query:
+      type: apiKey
+      in: query
+      name: api_token
+      description: api_token sent as a query parameter (works on every endpoint).
+
+  schemas:
+    RecognitionResult:
+      type: object
+      additionalProperties: true
+      required: [timecode]
+      description: |
+        A single recognition result. Shape varies by which catalog matched:
+
+        * Public-DB match — fields like `artist`, `title`, `album`,
+          `release_date`, `label`, `song_link` are populated; `audio_id` is
+          absent.
+        * Custom-DB match (caller's private fingerprint catalog) — only
+          `timecode` and `audio_id` are populated; the public-DB fields are
+          absent.
+
+        The SDK exposes `is_custom_match` / `is_public_match` discriminator
+        helpers and a `thumbnail_url` helper that returns
+        `{song_link}?thumb` only when the host of `song_link` is `lis.tn`.
+      properties:
+        timecode:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          description: 'Position in the recognized song (MM:SS) at which the matched fragment plays.'
+        audio_id:
+          type: integer
+          description: Custom-DB match identifier. Mutually exclusive with the public-DB fields in practice.
+        artist:
+          type: string
+        title:
+          type: string
+        album:
+          type: string
+        release_date:
+          type: string
+          description: 'Date in YYYY-MM-DD format.'
+        label:
+          type: string
+        song_link:
+          type: string
+          format: uri
+          description: |
+            Canonical AudD link to the song page. For lis.tn-hosted links,
+            appending `?thumb` returns the cover-art image.
+        apple_music:
+          $ref: '#/components/schemas/AppleMusicMetadata'
+        spotify:
+          $ref: '#/components/schemas/SpotifyMetadata'
+        deezer:
+          $ref: '#/components/schemas/DeezerMetadata'
+        napster:
+          $ref: '#/components/schemas/NapsterMetadata'
+        musicbrainz:
+          type: array
+          items:
+            $ref: '#/components/schemas/MusicBrainzEntry'
+
+    RecognizeSuccessResponse:
+      type: object
+      additionalProperties: true
+      required: [status]
+      properties:
+        status:
+          type: string
+          const: success
+        result:
+          oneOf:
+            - $ref: '#/components/schemas/RecognitionResult'
+            - type: 'null'
+
+    AppleMusicMetadata:
+      type: object
+      additionalProperties: true
+      description: |
+        Mirror of the upstream Apple Music track payload. AudD passes it
+        through verbatim, so SDK consumers can rely on additional fields
+        appearing here as Apple ships them.
+      properties:
+        previews:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              url:
+                type: string
+                format: uri
+        artwork:
+          type: object
+          additionalProperties: true
+          properties:
+            width: { type: integer }
+            height: { type: integer }
+            url: { type: string }
+            bgColor: { type: string }
+            textColor1: { type: string }
+            textColor2: { type: string }
+            textColor3: { type: string }
+            textColor4: { type: string }
+        artistName: { type: string }
+        url: { type: string, format: uri }
+        discNumber: { type: integer }
+        genreNames:
+          type: array
+          items: { type: string }
+        durationInMillis: { type: integer }
+        releaseDate: { type: string }
+        name: { type: string }
+        isrc: { type: string }
+        albumName: { type: string }
+        playParams:
+          type: object
+          additionalProperties: true
+        trackNumber: { type: integer }
+        composerName: { type: string }
+
+    DeezerMetadata:
+      type: object
+      additionalProperties: true
+      description: Mirror of the upstream Deezer track payload. May be absent for some tracks.
+      properties:
+        id: { type: integer }
+        readable: { type: boolean }
+        title: { type: string }
+        title_short: { type: string }
+        title_version: { type: string }
+        link: { type: string, format: uri }
+        duration: { type: integer }
+        rank: { type: integer }
+        explicit_lyrics: { type: boolean }
+        explicit_content_lyrics: { type: integer }
+        explicit_content_cover: { type: integer }
+        preview: { type: string, format: uri }
+        md5_image: { type: string }
+        artist:
+          type: object
+          additionalProperties: true
+        album:
+          type: object
+          additionalProperties: true
+        type: { type: string }
+
+    NapsterMetadata:
+      type: object
+      additionalProperties: true
+      description: Mirror of the upstream Napster track payload. May be absent for some tracks.
+      properties:
+        type: { type: string }
+        id: { type: string }
+        index: { type: integer }
+        disc: { type: integer }
+        href: { type: string, format: uri }
+        playbackSeconds: { type: integer }
+        isExplicit: { type: boolean }
+        isStreamable: { type: boolean }
+        isAvailableInHiRes: { type: boolean }
+        name: { type: string }
+        isrc: { type: string }
+        shortcut: { type: string }
+        blurbs:
+          type: array
+          items: { type: string }
+        artistId: { type: string }
+        artistName: { type: string }
+        albumId: { type: string }
+        albumName: { type: string }
+        formats:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        previewURL: { type: string, format: uri }
+        contributors:
+          type: object
+          additionalProperties: true
+        links:
+          type: object
+          additionalProperties: true
+
+    MusicBrainzEntry:
+      type: object
+      additionalProperties: true
+      description: |
+        Single MusicBrainz recording match. AudD returns an array of these
+        because MusicBrainz's matching often surfaces multiple candidates.
+      required: [id]
+      properties:
+        id:
+          type: string
+          format: uuid
+        score:
+          oneOf:
+            - type: integer
+            - type: string  # MB sometimes returns score as a string
+        title: { type: string }
+        length: { type: integer }
+        disambiguation: { type: string }
+        video:
+          oneOf:
+            - type: boolean
+            - type: 'null'
+        artist-credit:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        releases:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        isrcs:
+          oneOf:
+            - type: array
+              items: { type: string }
+            - type: 'null'
+        tags:
+          oneOf:
+            - type: array
+              items:
+                type: object
+                additionalProperties: true
+            - type: 'null'
+
+    SpotifyMetadata:
+      type: object
+      additionalProperties: true
+      description: Mirror of the upstream Spotify track payload.
+      properties:
+        album:
+          type: object
+          additionalProperties: true
+        artists:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        available_markets:
+          oneOf:
+            - type: array
+              items: { type: string }
+            - type: 'null'
+        disc_number: { type: integer }
+        duration_ms: { type: integer }
+        explicit: { type: boolean }
+        external_ids:
+          type: object
+          additionalProperties: true
+        external_urls:
+          type: object
+          additionalProperties: true
+        href: { type: string, format: uri }
+        id: { type: string }
+        is_local: { type: boolean }
+        is_playable: { type: boolean }
+        linked_from:
+          oneOf:
+            - type: object
+              additionalProperties: true
+            - type: 'null'
+        name: { type: string }
+        popularity: { type: integer }
+        track_number: { type: integer }
+        type: { type: string }
+        uri: { type: string }
+
+    Stream:
+      type: object
+      additionalProperties: true
+      required: [radio_id, url, stream_running]
+      properties:
+        radio_id:
+          type: integer
+          description: Caller-supplied stream identifier.
+        url:
+          type: string
+          description: Stream URL or shortcut (`twitch:<channel>`, `youtube:<video_id>`, `youtube-ch:<channel_id>`).
+        stream_running:
+          type: boolean
+        longpoll_category:
+          type: string
+          description: |
+            Pre-derived 9-character longpoll category for this stream.
+            Equivalent to MD5(MD5(api_token) + str(radio_id))[:9].
+            Safe to share with clients (browser/widget) — no token leakage.
+
+    GetStreamsSuccessResponse:
+      type: object
+      additionalProperties: true
+      required: [status, result]
+      properties:
+        status:
+          type: string
+          const: success
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stream'
+
+    GetCallbackUrlSuccessResponse:
+      type: object
+      additionalProperties: true
+      required: [status, result]
+      properties:
+        status:
+          type: string
+          const: success
+        result:
+          type: string
+          format: uri
+          description: The configured callback URL.
+
+    StreamMutationSuccessResponse:
+      type: object
+      additionalProperties: true
+      required: [status]
+      description: Common shape returned by setCallbackUrl, addStream, setStreamUrl, deleteStream.
+      properties:
+        status:
+          type: string
+          const: success
+        result:
+          type: 'null'
+
+    StreamCallbackResultBody:
+      type: object
+      additionalProperties: true
+      required: [radio_id, results]
+      description: |
+        Inner shape of the recognition-result callback variant — the value
+        of the top-level `result` field. Holds the matched songs, the
+        stream identifier, and per-event metadata.
+      properties:
+        radio_id: { type: integer }
+        timestamp:
+          type: string
+          description: 'ISO-ish "YYYY-MM-DD HH:MM:SS" UTC.'
+        play_length:
+          type: integer
+          description: Seconds the song was played in the stream. Absent when callbacks=before.
+        results:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            required: [artist, title, score]
+            properties:
+              artist: { type: string }
+              title: { type: string }
+              album: { type: string }
+              release_date: { type: string }
+              label: { type: string }
+              score: { type: integer }
+              song_link: { type: string, format: uri }
+              apple_music: { $ref: '#/components/schemas/AppleMusicMetadata' }
+              spotify: { $ref: '#/components/schemas/SpotifyMetadata' }
+              deezer: { $ref: '#/components/schemas/DeezerMetadata' }
+              napster: { $ref: '#/components/schemas/NapsterMetadata' }
+              musicbrainz:
+                type: array
+                items: { $ref: '#/components/schemas/MusicBrainzEntry' }
+
+    StreamCallbackResultEnvelope:
+      type: object
+      additionalProperties: true
+      required: [status, result]
+      description: |
+        Recognition-result variant of the wire payload AudD POSTs to the
+        user's callback URL. Wraps `StreamCallbackResultBody` inside a
+        `{status: "success", result: ...}` envelope.
+      properties:
+        status:
+          type: string
+          const: success
+        result:
+          $ref: '#/components/schemas/StreamCallbackResultBody'
+
+    StreamCallbackNotification:
+      type: object
+      additionalProperties: true
+      required: [notification, time]
+      description: |
+        Notification variant of the callback payload. Sent when AudD's stream
+        recognition encounters a problem (connection failure, no music
+        detected, recovered) — separate from a recognition result. Has its
+        own top-level shape with `status: "-"`.
+      properties:
+        status:
+          type: string
+          const: '-'
+        notification:
+          type: object
+          additionalProperties: true
+          required: [radio_id, notification_code, notification_message]
+          properties:
+            radio_id: { type: integer }
+            stream_running: { type: boolean }
+            notification_code:
+              type: integer
+              enum: [0, 650, 651]
+              description: |
+                * 0 — healthy
+                * 650 — can't connect to the stream
+                * 651 — only white noise / no music detected
+            notification_message: { type: string }
+        time:
+          type: integer
+          description: Unix timestamp.
+
+    StreamCallbackPayload:
+      oneOf:
+        - $ref: '#/components/schemas/StreamCallbackResultEnvelope'
+        - $ref: '#/components/schemas/StreamCallbackNotification'
+      description: |
+        Wire format the SDK's `streams.parse_callback(...)` consumes — either
+        a recognition-result envelope or a notification.
+
+    CustomCatalogUploadSuccessResponse:
+      type: object
+      additionalProperties: true
+      required: [status]
+      properties:
+        status:
+          type: string
+          const: success
+        result:
+          type: 'null'
+
+    LyricsResult:
+      type: object
+      additionalProperties: true
+      required: [artist, title]
+      description: A single lyrics search hit.
+      properties:
+        artist: { type: string }
+        title: { type: string }
+        lyrics: { type: string }
+        song_id: { type: integer }
+        media: { type: string }
+        full_title: { type: string }
+        artist_id: { type: integer }
+        song_link: { type: string, format: uri }
+
+    FindLyricsSuccessResponse:
+      type: object
+      additionalProperties: true
+      required: [status, result]
+      properties:
+        status:
+          type: string
+          const: success
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/LyricsResult'
+
+    LongpollTimeoutResponse:
+      type: object
+      additionalProperties: true
+      required: [timeout, timestamp]
+      description: |
+        Returned when the longpoll wait elapsed without new events. The
+        client should issue a new request using `timestamp` as the next
+        `since_time`.
+      properties:
+        timeout:
+          type: string
+          const: 'no events before timeout'
+        timestamp:
+          type: integer
+          description: Server timestamp (ms) — pass as `since_time` on the next request.
+
+    LongpollEventResponse:
+      type: object
+      additionalProperties: true
+      required: [timestamp]
+      description: |
+        Returned when one or more new recognition events fired during the
+        wait. Carries the same per-event shape as a callback payload (either
+        a `StreamCallbackResultBody` under `result`, or a notification block
+        under `notification`) plus a `timestamp` to use as the next
+        `since_time`. Tightening this oneOf during Phase 1 once a real fixture
+        is captured.
+      properties:
+        result:
+          $ref: '#/components/schemas/StreamCallbackResultBody'
+        notification:
+          type: object
+          additionalProperties: true
+        status:
+          type: string
+        timestamp:
+          type: integer
+
+    LongpollResponse:
+      anyOf:
+        - $ref: '#/components/schemas/LongpollTimeoutResponse'
+        - $ref: '#/components/schemas/LongpollEventResponse'
+      description: |
+        Use `anyOf` rather than `oneOf` because both branches use
+        `additionalProperties: true` and a timeout response (`timeout` +
+        `timestamp`) trivially also satisfies the event-response branch
+        (which only requires `timestamp`). SDKs disambiguate by presence
+        of the `timeout` field.
+
+    EnterpriseMatch:
+      type: object
+      additionalProperties: true
+      required: [score, timecode]
+      description: |
+        A single match within a 12-second chunk of an enterprise-uploaded
+        file. Multiple matches per chunk indicate competing candidates;
+        higher `score` is more confident.
+      properties:
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        artist: { type: string }
+        title: { type: string }
+        album: { type: string }
+        release_date: { type: string }
+        label: { type: string }
+        timecode:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          description: 'Position in the original song (MM:SS) where the matched fragment plays.'
+        isrc:
+          type: string
+          description: Present only on enterprise-tier accounts.
+        upc:
+          type: string
+          description: Present only on enterprise-tier accounts.
+        song_link:
+          type: string
+          format: uri
+        start_offset:
+          type: integer
+          description: Position (milliseconds) within the 12-second chunk where the match begins.
+        end_offset:
+          type: integer
+          description: Position (milliseconds) within the 12-second chunk where the match ends.
+
+    EnterpriseChunkResult:
+      type: object
+      additionalProperties: true
+      required: [songs, offset]
+      properties:
+        songs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnterpriseMatch'
+        offset:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          description: Position (MM:SS) in the submitted file at which this 12-second chunk begins.
+
+    EnterpriseSuccessResponse:
+      type: object
+      additionalProperties: true
+      required: [status, result]
+      properties:
+        status:
+          type: string
+          const: success
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnterpriseChunkResult'
+        execution_time:
+          type: string
+          description: Wall-clock execution time on the server.
+
+    ErrorResponse:
+      type: object
+      additionalProperties: true
+      required: [status, error]
+      properties:
+        status:
+          type: string
+          const: error
+        error:
+          type: object
+          required: [error_code, error_message]
+          additionalProperties: true
+          properties:
+            error_code:
+              type: integer
+              description: |
+                AudD-specific numeric error code. The SDK maps each code to a
+                typed exception class (see audd-<lang>/docs/errors.md). The
+                full set: 19, 20, 31337, 40, 50, 51, 100, 300, 400, 500, 600,
+                601, 602, 610, 611, 700, 701, 702, 900, 901, 902, 903, 904,
+                905, 906, 907, 1000.
+              enum: [19, 20, 31337, 40, 50, 51, 100, 300, 400, 500, 600, 601, 602, 610, 611, 700, 701, 702, 900, 901, 902, 903, 904, 905, 906, 907, 1000]
+            error_message:
+              type: string
+              description: Human-readable, server-provided. Already includes any subscription-nudge appendix.
+        request_params:
+          type: object
+          additionalProperties: true
+          description: |
+            Server's redacted echo of the request parameters. The api_token
+            field is masked (e.g., "d***e"). Standard endpoint uses this field
+            name; the enterprise endpoint uses `requested_params` (see below).
+        requested_params:
+          type: object
+          additionalProperties: true
+          description: |
+            Same as `request_params` but with this alternate name as returned
+            by the enterprise endpoint. SDKs should normalize these into one
+            field on the SDK-side error object.
+        request_api_method:
+          type: string
+          description: |
+            Humanized echo of the API method (e.g., "Recognition", "Adding a
+            stream stream", "Getting the URL for callbacks"). Informational
+            only — not a programmatic discriminator.
+        request_http_method:
+          type: string
+          enum: [GET, POST]
+        execution_time:
+          type: string
+          description: Wall-clock execution time on the server (enterprise endpoint only).
+        result:
+          type: object
+          additionalProperties: true
+          description: |
+            For most errors, omitted. For codes 19 and 31337, the server may
+            populate a "branded" result with `artist`/`title` strings — the
+            SDK surfaces these on the exception's `branded_message` field
+            and does NOT expose them as a recognition result.
+          properties:
+            artist:
+              type: string
+            title:
+              type: string
+        see api documentation:
+          type: string
+          format: uri
+        contact us:
+          type: string
+          format: email
+
+paths:
+  /:
+    post:
+      operationId: recognize
+      summary: Identify a song from a short audio clip (≤25 seconds, ≤10 MB).
+      description: |
+        Standard music recognition. Send a file directly (multipart) or pass
+        a URL the AudD server downloads.
+
+        For audio longer than 25 seconds, see the enterprise endpoint
+        (`POST https://enterprise.audd.io/`).
+      tags: [Recognition]
+      servers:
+        - url: https://api.audd.io
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token]
+              properties:
+                api_token:
+                  type: string
+                  description: From https://dashboard.audd.io.
+                url:
+                  type: string
+                  format: uri
+                  description: HTTPS URL of the audio file. One of `url`, `file`, or `audio` is required.
+                file:
+                  type: string
+                  format: binary
+                  description: Multipart file upload. One of `url`, `file`, or `audio` is required.
+                audio:
+                  type: string
+                  description: Base64-encoded audio. Discouraged; limited support.
+                "return":
+                  type: string
+                  description: |
+                    Comma-separated metadata identifiers. Valid values:
+                    `apple_music`, `spotify`, `deezer`, `napster`, `musicbrainz`.
+                  example: 'apple_music,spotify'
+                market:
+                  type: string
+                  description: ISO country code for Apple Music / iTunes / Spotify regional results. Default `us`.
+                  example: us
+      responses:
+        '200':
+          description: |
+            Recognition processed. The response is a `success` payload (with
+            `result` either populated or null when no match was found) or an
+            `error` payload.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/RecognizeSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                with_metadata:
+                  summary: Public-DB match with apple_music + spotify + musicbrainz return
+                  externalValue: ./fixtures/recognize_with_metadata.json
+                custom_match:
+                  summary: Custom-DB match (caller's fingerprint catalog)
+                  externalValue: ./fixtures/recognize_custom_match.json
+                error_invalid_token:
+                  summary: Error 900 — invalid api_token
+                  externalValue: ./fixtures/error_900_invalid_token.json
+                error_no_file:
+                  summary: Error 700 — no file or url sent
+                  externalValue: ./fixtures/error_700_no_file.json
+    get:
+      operationId: recognizeGet
+      summary: Same as POST recognize, but with parameters in the query string.
+      description: GET form of `/`. Useful for quick tests in a browser; POST is preferred.
+      tags: [Recognition]
+      servers:
+        - url: https://api.audd.io
+      parameters:
+        - in: query
+          name: api_token
+          required: true
+          schema: { type: string }
+        - in: query
+          name: url
+          schema: { type: string, format: uri }
+        - in: query
+          name: "return"
+          schema: { type: string }
+        - in: query
+          name: market
+          schema: { type: string }
+      responses:
+        '200':
+          description: Same shapes as POST.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/RecognizeSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                with_metadata:
+                  externalValue: ./fixtures/recognize_with_metadata.json
+
+  /setCallbackUrl/:
+    post:
+      operationId: setCallbackUrl
+      summary: Configure where AudD POSTs stream-recognition callbacks.
+      tags: [Streams]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token, url]
+              properties:
+                api_token: { type: string }
+                url:
+                  type: string
+                  format: uri
+                  description: |
+                    Where AudD POSTs callbacks. Set to `https://audd.tech/empty/`
+                    if you only want longpoll. The URL itself can carry a
+                    `?return=apple_music,deezer` parameter to receive that
+                    metadata in callbacks.
+      responses:
+        '200':
+          description: Callback URL set or rejected.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/StreamMutationSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                success:
+                  summary: Standard mutation-success response
+                  value:
+                    status: success
+                    result: null
+
+  /getCallbackUrl/:
+    post:
+      operationId: getCallbackUrl
+      summary: Get the configured callback URL.
+      tags: [Streams]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token]
+              properties:
+                api_token: { type: string }
+      responses:
+        '200':
+          description: |
+            Returns the URL or — when no callback URL has ever been
+            configured — error code 19 with message "Internal error".
+            **The SDK uses this signal to short-circuit longpoll setup.**
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GetCallbackUrlSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                no_callback_configured:
+                  externalValue: ./fixtures/error_19_no_callback_url.json
+
+  /addStream/:
+    post:
+      operationId: addStream
+      summary: Add a stream for live recognition.
+      tags: [Streams]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token, url, radio_id]
+              properties:
+                api_token: { type: string }
+                url:
+                  type: string
+                  description: |
+                    Stream URL — direct (DASH/Icecast/HLS/m3u/m3u8) or shortcut
+                    (`twitch:<channel>`, `youtube:<video_id>`, `youtube-ch:<channel_id>`).
+                radio_id:
+                  type: integer
+                  description: Caller-supplied identifier; must be unique per account.
+                callbacks:
+                  type: string
+                  enum: [before]
+                  description: |
+                    Set to `before` to receive callbacks at song start.
+                    Default is callbacks at song end (with total play length).
+      responses:
+        '200':
+          description: Stream added or rejected (e.g., #902 if subscription slots are exhausted).
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/StreamMutationSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_slots_exhausted:
+                  externalValue: ./fixtures/error_902_stream_limit.json
+
+  /getStreams/:
+    post:
+      operationId: getStreams
+      summary: List configured streams.
+      tags: [Streams]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token]
+              properties:
+                api_token: { type: string }
+      responses:
+        '200':
+          description: Returns the array of configured streams (may be empty).
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GetStreamsSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                empty:
+                  externalValue: ./fixtures/getStreams_empty.json
+
+  /setStreamUrl/:
+    post:
+      operationId: setStreamUrl
+      summary: Update an existing stream's URL.
+      tags: [Streams]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token, radio_id, url]
+              properties:
+                api_token: { type: string }
+                radio_id: { type: integer }
+                url: { type: string }
+      responses:
+        '200':
+          description: Stream URL updated or rejected.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/StreamMutationSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                success:
+                  summary: Standard mutation-success response
+                  value:
+                    status: success
+                    result: null
+
+  /deleteStream/:
+    post:
+      operationId: deleteStream
+      summary: Delete a stream.
+      tags: [Streams]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token, radio_id]
+              properties:
+                api_token: { type: string }
+                radio_id: { type: integer }
+      responses:
+        '200':
+          description: Stream deleted or rejected.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/StreamMutationSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                success:
+                  summary: Standard mutation-success response
+                  value:
+                    status: success
+                    result: null
+
+  /upload/:
+    post:
+      operationId: customCatalogAdd
+      summary: Add a song to the caller's private fingerprint catalog (NOT for music recognition).
+      description: |
+        ⚠ **This is NOT how you submit audio for music recognition.** For
+        recognition, use `POST /` (or `POST enterprise.audd.io/` for files
+        longer than 25 seconds). This endpoint adds a song to the caller's
+        private fingerprint catalog so AudD can later identify it for the
+        caller's account only.
+
+        Requires special access — contact api@audd.io to enable.
+
+        Calling `upload` again with the same `audio_id` re-fingerprints that
+        slot. There is no public list/delete endpoint; callers track
+        `audio_id` ↔ song mappings on their side.
+      tags: [Custom catalog]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token, audio_id]
+              properties:
+                api_token: { type: string }
+                audio_id:
+                  type: integer
+                  description: |
+                    Caller-supplied identifier returned alongside future
+                    recognition results when this song is matched.
+                url:
+                  type: string
+                  format: uri
+                  description: One of `url` or `file` is required.
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Catalog updated, or 904 if the caller's token doesn't have access.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/CustomCatalogUploadSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                success:
+                  summary: Custom catalog updated
+                  value:
+                    status: success
+                    result: null
+
+  /findLyrics/:
+    post:
+      operationId: findLyrics
+      summary: Search lyrics by text query.
+      description: |
+        Lyrics search. SDKs expose this under their `advanced.*` namespace
+        — it's deliberately not on the main client to keep the recognition
+        surface focused.
+      tags: [Advanced]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token, q]
+              properties:
+                api_token: { type: string }
+                q:
+                  type: string
+                  description: Free-text lyrics query.
+      responses:
+        '200':
+          description: Lyrics search hits or error.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/FindLyricsSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                success_with_one_hit:
+                  summary: Single lyrics result
+                  value:
+                    status: success
+                    result:
+                      - artist: Imagine Dragons
+                        title: Warriors
+                        lyrics: "[Verse 1]\nAs a child you would wait..."
+                        song_id: 12345
+                        full_title: "Warriors by Imagine Dragons"
+
+  /longpoll/:
+    get:
+      operationId: longpoll
+      summary: Long-poll for new recognition events on a category.
+      description: |
+        Long-polls for new recognition events. The category can be derived
+        locally from the api_token + radio_id, or read from the
+        `longpoll_category` field of `getStreams`.
+
+        **Important DX caveat:** when no callback URL is configured for the
+        account (which the server signals via error #19 from `getCallbackUrl`),
+        longpoll silently returns timeout responses forever — events never
+        fire. Every official SDK preflights `getCallbackUrl` and raises a
+        descriptive error if no callback URL is set. The check is bypassable
+        via a `skip_callback_check` flag.
+      tags: [Streams]
+      parameters:
+        - in: query
+          name: category
+          required: true
+          schema: { type: string }
+          description: 9-char longpoll category — `longpoll_category` from `getStreams` or MD5(MD5(api_token)+str(radio_id))[:9].
+        - in: query
+          name: timeout
+          schema: { type: integer, default: 50, minimum: 1, maximum: 90 }
+          description: Seconds to wait for events before returning the timeout response.
+        - in: query
+          name: since_time
+          schema: { type: integer }
+          description: Server timestamp (ms) returned in the previous response — used to deduplicate events.
+      responses:
+        '200':
+          description: |
+            Either a timeout response (no events) or an event response (one
+            or more new recognitions/notifications).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LongpollResponse'
+              examples:
+                timeout:
+                  externalValue: ./fixtures/longpoll_no_events.json
+
+  /enterprise/:
+    post:
+      operationId: recognizeEnterprise
+      summary: Recognize music in large audio/video files (hours- or days-long).
+      description: |
+        Enterprise endpoint. Send an HTTPS URL or a multipart file (streamed,
+        no in-memory buffering needed). The endpoint chunks the audio into
+        12-second segments and counts each scanned chunk as 1 request.
+
+        SDKs default to a 1-hour read timeout for this endpoint and enable TCP
+        keepalive on the transport.
+      tags: [Recognition]
+      servers:
+        - url: https://enterprise.audd.io
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: true
+              required: [api_token]
+              properties:
+                api_token: { type: string }
+                url: { type: string, format: uri }
+                file: { type: string, format: binary }
+                "return":
+                  type: string
+                  description: |
+                    Comma-separated metadata identifiers. Same as the standard
+                    endpoint — but **Spotify is NOT supported** on enterprise.
+                accurate_offsets:
+                  type: string
+                  enum: ['true', 'false']
+                  description: When 'true', return per-match start/end offsets within each 12-second chunk.
+                skip:
+                  type: integer
+                  description: Number of 12-second chunks to skip after each scanned chunk.
+                every:
+                  type: integer
+                  description: Number of consecutive chunks to scan.
+                limit:
+                  type: integer
+                  description: |
+                    Upper bound on the number of chunks to recognize. **Always
+                    set this in dev/test environments to control cost.**
+                skip_first_seconds:
+                  type: integer
+                use_timecode:
+                  type: string
+                  enum: ['true', 'false']
+                  description: |
+                    When 'true', use the `t`/`time_continue`/`start` URL parameter
+                    of the source URL as `skip_first_seconds`. Mutually exclusive
+                    with `skip_first_seconds`.
+                response_type:
+                  type: string
+                  enum: [json, csv]
+                  description: Output format. Default json.
+      responses:
+        '200':
+          description: Recognition processed. JSON or CSV depending on `response_type`.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/EnterpriseSuccessResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                success_with_isrc_upc:
+                  externalValue: ./fixtures/enterprise_with_isrc_upc.json
+                error_unauthorized:
+                  externalValue: ./fixtures/error_904_enterprise_unauthorized.json
+            text/csv:
+              schema:
+                type: string
+                description: CSV when `response_type=csv`.

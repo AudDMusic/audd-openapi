@@ -1,0 +1,54 @@
+name: Dispatch to SDKs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'openapi.yaml'
+      - 'fixtures/**'
+
+permissions: {}
+
+jobs:
+  fan-out:
+    name: Trigger contract tests across SDK repos
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - audd-python
+          - audd-node
+          - audd-java
+          - audd-kotlin
+          - audd-swift
+          - audd-dotnet
+          - audd-ruby
+          - audd-php
+          - audd-rust
+          - audd-go
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.SDK_DISPATCH_APP_ID }}
+          private-key: ${{ secrets.SDK_DISPATCH_APP_PRIVATE_KEY }}
+          owner: AudDMusic
+          repositories: ${{ matrix.sdk }}
+
+      - name: Fire repository_dispatch
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          SDK_REPO: ${{ matrix.sdk }}
+          TRIGGER_SHA: ${{ github.sha }}
+          TRIGGER_RUN_ID: ${{ github.run_id }}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/AudDMusic/$SDK_REPO/dispatches" \
+            -f event_type=openapi-updated \
+            -f "client_payload[trigger_sha]=$TRIGGER_SHA" \
+            -f "client_payload[trigger_run_id]=$TRIGGER_RUN_ID"
+          echo "dispatched openapi-updated to AudDMusic/$SDK_REPO"
