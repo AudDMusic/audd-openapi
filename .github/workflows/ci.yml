@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  spec-validate:
+    name: OpenAPI spec validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install
+        run: pip install -r requirements-dev.txt
+      - name: Validate openapi.yaml structure
+        run: |
+          python -c "
+          import yaml, openapi_spec_validator as v
+          v.validate(yaml.safe_load(open('openapi.yaml')))
+          print('openapi.yaml: structurally valid')
+          "
+      - name: Validate fixtures against spec schemas
+        run: python tests/validate.py
+
+  redocly-lint:
+    name: Redocly lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install redocly
+        run: npm install -g @redocly/cli@1
+      - name: Lint
+        run: redocly lint openapi.yaml

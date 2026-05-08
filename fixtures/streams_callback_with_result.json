@@ -1,0 +1,19 @@
+{
+  "status": "success",
+  "result": {
+    "radio_id": 7,
+    "timestamp": "2020-04-13 10:31:43",
+    "play_length": 111,
+    "results": [
+      {
+        "artist": "Alan Walker, A$AP Rocky",
+        "title": "Live Fast (PUBGM)",
+        "album": "Live Fast (PUBGM)",
+        "release_date": "2019-07-25",
+        "label": "MER Recordings",
+        "score": 100,
+        "song_link": "https://lis.tn/LiveFastPUBGM"
+      }
+    ]
+  }
+}

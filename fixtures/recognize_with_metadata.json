@@ -1,0 +1,734 @@
+{
+  "status": "success",
+  "result": {
+    "artist": "Tears For Fears",
+    "title": "Everybody Wants To Rule The World",
+    "album": "Songs From The Big Chair",
+    "release_date": "2014-11-10",
+    "label": "UMC (Universal Music Catalogue)",
+    "timecode": "00:56",
+    "song_link": "https://lis.tn/NbkVb",
+    "apple_music": {
+      "previews": [
+        {
+          "url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2a/c5/8e/2ac58ef1-094d-97f6-3f62-a9f6e7684ccd/mzaf_15145928605517237933.plus.aac.p.m4a"
+        }
+      ],
+      "artwork": {
+        "width": 1500,
+        "height": 1500,
+        "url": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/38/97/cb/3897cb85-279f-6698-0158-ad3f73937050/14UMGIM37917.rgb.jpg/{w}x{h}bb.jpg",
+        "bgColor": "090e0e",
+        "textColor1": "edecea",
+        "textColor2": "d1cecf",
+        "textColor3": "c0c0be",
+        "textColor4": "a9a7a8"
+      },
+      "artistName": "Tears for Fears",
+      "url": "https://music.apple.com/us/album/everybody-wants-to-rule-the-world-alternative-single/1440825207?app=music&at=1000l33QU&i=1440826582&mt=1",
+      "discNumber": 4,
+      "genreNames": [
+        "Pop",
+        "Music"
+      ],
+      "durationInMillis": 261013,
+      "releaseDate": "1985-02-17",
+      "name": "Everybody Wants To Rule the World (Alternative Single Version)",
+      "isrc": "GBUM71403885",
+      "albumName": "Songs From the Big Chair (Super Deluxe Version)",
+      "playParams": {
+        "id": "1440826582",
+        "kind": "song"
+      },
+      "trackNumber": 14,
+      "composerName": "Ian Stanley, Roland Orzabal & Christopher Merrick Hughes",
+      "isAppleDigitalMaster": true,
+      "hasLyrics": true
+    },
+    "musicbrainz": [
+      {
+        "id": "14379ff4-5128-4e0f-8d08-1a4e50f53187",
+        "score": 100,
+        "title": "Everybody Wants to Rule the World (alternate single version)",
+        "length": 261022,
+        "disambiguation": "",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tears for Fears",
+            "artist": {
+              "id": "7c7f9c94-dee8-4903-892b-6cf44652e2de",
+              "name": "Tears for Fears",
+              "sort-name": "Tears for Fears"
+            }
+          }
+        ],
+        "releases": [
+          {
+            "id": "8b9c8913-0ebc-42ed-85d5-c426e5abdd6f",
+            "count": 4,
+            "title": "Songs From the Big Chair",
+            "status": "Official",
+            "disambiguation": "super deluxe edition",
+            "date": "",
+            "country": "",
+            "release-events": null,
+            "track-count": 59,
+            "media": [
+              {
+                "position": 4,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "faf6d16c-4544-4c5e-a2b1-2766ff5058f0",
+                    "number": "14",
+                    "title": "Everybody Wants to Rule the World (alternative single version)",
+                    "length": 261022
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 13
+              }
+            ],
+            "artist-credit": [
+              {
+                "name": "Tears for Fears",
+                "artist": {
+                  "id": "7c7f9c94-dee8-4903-892b-6cf44652e2de",
+                  "name": "Tears for Fears",
+                  "sort-name": "Tears for Fears",
+                  "disambiguation": ""
+                }
+              }
+            ],
+            "release-group": {
+              "id": "475946e9-4b00-3f7c-9bd7-c11f55740262",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Songs From the Big Chair",
+              "primary-type": "Album",
+              "secondary-types": null
+            }
+          },
+          {
+            "id": "395aa652-774e-42b9-bba3-3051913767d5",
+            "count": 1,
+            "title": "Everybody Wants to Rule the World",
+            "status": "Official",
+            "date": "2025-03-21",
+            "country": "CZ",
+            "release-events": [
+              {
+                "date": "2025-03-21",
+                "area": {
+                  "id": "51d34c28-61bf-3d21-849f-7492672a9d44",
+                  "name": "Czechia",
+                  "sort-name": "Czechia",
+                  "iso-3166-1-codes": [
+                    "CZ"
+                  ]
+                }
+              }
+            ],
+            "track-count": 10,
+            "media": [
+              {
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "884c5660-6248-4940-ad13-c11c19d6444d",
+                    "number": "3",
+                    "title": "Everybody Wants to Rule the World (alternative single version)",
+                    "length": 261022
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 2
+              }
+            ],
+            "artist-credit": [
+              {
+                "name": "Tears for Fears",
+                "artist": {
+                  "id": "7c7f9c94-dee8-4903-892b-6cf44652e2de",
+                  "name": "Tears for Fears",
+                  "sort-name": "Tears for Fears",
+                  "disambiguation": ""
+                }
+              }
+            ],
+            "release-group": {
+              "id": "64b89ba1-db07-3569-828d-9d2fa7f955d2",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Everybody Wants to Rule the World",
+              "primary-type": "Single",
+              "secondary-types": null
+            }
+          },
+          {
+            "id": "ad82cea0-a56e-4ba0-9ab6-2089fe9d00a0",
+            "count": 6,
+            "title": "Songs From the Big Chair",
+            "status": "Official",
+            "disambiguation": "super deluxe edition",
+            "date": "2014-11-07",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2014-11-07",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 102,
+            "media": [
+              {
+                "position": 4,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "484ca2ad-0586-4550-8e52-b01f594900f9",
+                    "number": "14",
+                    "title": "Everybody Wants to Rule the World (alternate single version)",
+                    "length": 263013
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 13
+              }
+            ],
+            "artist-credit": [
+              {
+                "name": "Tears for Fears",
+                "artist": {
+                  "id": "7c7f9c94-dee8-4903-892b-6cf44652e2de",
+                  "name": "Tears for Fears",
+                  "sort-name": "Tears for Fears",
+                  "disambiguation": ""
+                }
+              }
+            ],
+            "release-group": {
+              "id": "475946e9-4b00-3f7c-9bd7-c11f55740262",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Songs From the Big Chair",
+              "primary-type": "Album",
+              "secondary-types": null
+            }
+          },
+          {
+            "id": "fc34b623-cff1-40bb-80d7-716d0dfe4c6a",
+            "count": 4,
+            "title": "Songs From the Big Chair",
+            "status": "Official",
+            "disambiguation": "super deluxe version, mastered for iTunes",
+            "date": "2015-03-20",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2015-03-20",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 59,
+            "media": [
+              {
+                "position": 4,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "573f234b-a390-4120-8d08-400b8cdbc2c5",
+                    "number": "14",
+                    "title": "Everybody Wants to Rule the World (alternative single version)",
+                    "length": 261013
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 13
+              }
+            ],
+            "artist-credit": [
+              {
+                "name": "Tears for Fears",
+                "artist": {
+                  "id": "7c7f9c94-dee8-4903-892b-6cf44652e2de",
+                  "name": "Tears for Fears",
+                  "sort-name": "Tears for Fears",
+                  "disambiguation": ""
+                }
+              }
+            ],
+            "release-group": {
+              "id": "475946e9-4b00-3f7c-9bd7-c11f55740262",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Songs From the Big Chair",
+              "primary-type": "Album",
+              "secondary-types": null
+            }
+          }
+        ],
+        "isrcs": [
+          "GBUM71403885"
+        ],
+        "tags": null
+      }
+    ],
+    "spotify": {
+      "album": {
+        "name": "Songs From The Big Chair (Super Deluxe Edition)",
+        "artists": [
+          {
+            "name": "Tears For Fears",
+            "id": "4bthk9UfsYUYdcFyqxmSUU",
+            "uri": "spotify:artist:4bthk9UfsYUYdcFyqxmSUU",
+            "href": "https://api.spotify.com/v1/artists/4bthk9UfsYUYdcFyqxmSUU",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/4bthk9UfsYUYdcFyqxmSUU"
+            }
+          }
+        ],
+        "album_group": "",
+        "album_type": "compilation",
+        "id": "3myPwaMYjdwhtq0nFgeG6W",
+        "uri": "spotify:album:3myPwaMYjdwhtq0nFgeG6W",
+        "available_markets": [
+          "AR",
+          "AU",
+          "AT",
+          "BE",
+          "BO",
+          "BR",
+          "BG",
+          "CA",
+          "CL",
+          "CO",
+          "CR",
+          "CY",
+          "CZ",
+          "DK",
+          "DO",
+          "DE",
+          "EC",
+          "EE",
+          "SV",
+          "FI",
+          "FR",
+          "GR",
+          "GT",
+          "HN",
+          "HK",
+          "HU",
+          "IS",
+          "IE",
+          "IT",
+          "LV",
+          "LT",
+          "LU",
+          "MY",
+          "MT",
+          "MX",
+          "NL",
+          "NZ",
+          "NI",
+          "NO",
+          "PA",
+          "PY",
+          "PE",
+          "PH",
+          "PL",
+          "PT",
+          "SG",
+          "SK",
+          "ES",
+          "SE",
+          "CH",
+          "TW",
+          "TR",
+          "UY",
+          "US",
+          "GB",
+          "AD",
+          "LI",
+          "MC",
+          "ID",
+          "JP",
+          "TH",
+          "VN",
+          "RO",
+          "IL",
+          "ZA",
+          "SA",
+          "AE",
+          "BH",
+          "QA",
+          "OM",
+          "KW",
+          "EG",
+          "MA",
+          "DZ",
+          "TN",
+          "LB",
+          "JO",
+          "PS",
+          "IN",
+          "BY",
+          "KZ",
+          "MD",
+          "UA",
+          "AL",
+          "BA",
+          "HR",
+          "ME",
+          "MK",
+          "RS",
+          "SI",
+          "KR",
+          "BD",
+          "PK",
+          "LK",
+          "GH",
+          "KE",
+          "NG",
+          "TZ",
+          "UG",
+          "AG",
+          "AM",
+          "BS",
+          "BB",
+          "BZ",
+          "BT",
+          "BW",
+          "BF",
+          "CV",
+          "CW",
+          "DM",
+          "FJ",
+          "GM",
+          "GE",
+          "GD",
+          "GW",
+          "GY",
+          "HT",
+          "JM",
+          "KI",
+          "LS",
+          "LR",
+          "MW",
+          "MV",
+          "ML",
+          "MH",
+          "FM",
+          "NA",
+          "NR",
+          "NE",
+          "PW",
+          "PG",
+          "WS",
+          "SM",
+          "ST",
+          "SN",
+          "SC",
+          "SL",
+          "SB",
+          "KN",
+          "LC",
+          "VC",
+          "SR",
+          "TL",
+          "TO",
+          "TT",
+          "TV",
+          "VU",
+          "AZ",
+          "BN",
+          "BI",
+          "KH",
+          "CM",
+          "TD",
+          "KM",
+          "GQ",
+          "SZ",
+          "GA",
+          "GN",
+          "KG",
+          "LA",
+          "MO",
+          "MR",
+          "MN",
+          "NP",
+          "RW",
+          "TG",
+          "UZ",
+          "ZW",
+          "BJ",
+          "MG",
+          "MU",
+          "MZ",
+          "AO",
+          "CI",
+          "DJ",
+          "ZM",
+          "CD",
+          "CG",
+          "IQ",
+          "LY",
+          "TJ",
+          "VE",
+          "ET",
+          "XK"
+        ],
+        "href": "https://api.spotify.com/v1/albums/3myPwaMYjdwhtq0nFgeG6W",
+        "images": [
+          {
+            "height": 640,
+            "width": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b27322463d6939fec9e17b2a6235"
+          },
+          {
+            "height": 300,
+            "width": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e0222463d6939fec9e17b2a6235"
+          },
+          {
+            "height": 64,
+            "width": 64,
+            "url": "https://i.scdn.co/image/ab67616d0000485122463d6939fec9e17b2a6235"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/3myPwaMYjdwhtq0nFgeG6W"
+        },
+        "release_date": "1985-02-25",
+        "release_date_precision": "day"
+      },
+      "external_ids": {
+        "isrc": "GBUM71403885"
+      },
+      "popularity": 36,
+      "is_playable": true,
+      "linked_from": null,
+      "artists": [
+        {
+          "name": "Tears For Fears",
+          "id": "4bthk9UfsYUYdcFyqxmSUU",
+          "uri": "spotify:artist:4bthk9UfsYUYdcFyqxmSUU",
+          "href": "https://api.spotify.com/v1/artists/4bthk9UfsYUYdcFyqxmSUU",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/4bthk9UfsYUYdcFyqxmSUU"
+          }
+        }
+      ],
+      "available_markets": [
+        "AR",
+        "AU",
+        "AT",
+        "BE",
+        "BO",
+        "BR",
+        "BG",
+        "CA",
+        "CL",
+        "CO",
+        "CR",
+        "CY",
+        "CZ",
+        "DK",
+        "DO",
+        "DE",
+        "EC",
+        "EE",
+        "SV",
+        "FI",
+        "FR",
+        "GR",
+        "GT",
+        "HN",
+        "HK",
+        "HU",
+        "IS",
+        "IE",
+        "IT",
+        "LV",
+        "LT",
+        "LU",
+        "MY",
+        "MT",
+        "NL",
+        "NZ",
+        "NI",
+        "NO",
+        "PA",
+        "PY",
+        "PE",
+        "PH",
+        "PL",
+        "PT",
+        "SG",
+        "SK",
+        "ES",
+        "SE",
+        "CH",
+        "TW",
+        "TR",
+        "UY",
+        "US",
+        "GB",
+        "AD",
+        "LI",
+        "MC",
+        "ID",
+        "JP",
+        "TH",
+        "VN",
+        "RO",
+        "IL",
+        "ZA",
+        "SA",
+        "AE",
+        "BH",
+        "QA",
+        "OM",
+        "KW",
+        "EG",
+        "MA",
+        "DZ",
+        "TN",
+        "LB",
+        "JO",
+        "PS",
+        "IN",
+        "BY",
+        "KZ",
+        "MD",
+        "UA",
+        "AL",
+        "BA",
+        "HR",
+        "ME",
+        "MK",
+        "RS",
+        "SI",
+        "KR",
+        "BD",
+        "PK",
+        "LK",
+        "GH",
+        "KE",
+        "NG",
+        "TZ",
+        "UG",
+        "AG",
+        "AM",
+        "BS",
+        "BB",
+        "BZ",
+        "BT",
+        "BW",
+        "BF",
+        "CV",
+        "CW",
+        "DM",
+        "FJ",
+        "GM",
+        "GE",
+        "GD",
+        "GW",
+        "GY",
+        "HT",
+        "JM",
+        "KI",
+        "LS",
+        "LR",
+        "MW",
+        "MV",
+        "ML",
+        "MH",
+        "FM",
+        "NA",
+        "NR",
+        "NE",
+        "PW",
+        "PG",
+        "WS",
+        "SM",
+        "ST",
+        "SN",
+        "SC",
+        "SL",
+        "SB",
+        "KN",
+        "LC",
+        "VC",
+        "SR",
+        "TL",
+        "TO",
+        "TT",
+        "TV",
+        "VU",
+        "AZ",
+        "BN",
+        "BI",
+        "KH",
+        "CM",
+        "TD",
+        "KM",
+        "GQ",
+        "SZ",
+        "GA",
+        "GN",
+        "KG",
+        "LA",
+        "MO",
+        "MR",
+        "MN",
+        "NP",
+        "RW",
+        "TG",
+        "UZ",
+        "ZW",
+        "BJ",
+        "MG",
+        "MU",
+        "MZ",
+        "AO",
+        "CI",
+        "DJ",
+        "ZM",
+        "CD",
+        "CG",
+        "IQ",
+        "LY",
+        "TJ",
+        "VE",
+        "ET",
+        "XK"
+      ],
+      "disc_number": 4,
+      "duration_ms": 261022,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/5B9qVIyjqeWkeOAp2tJgqL"
+      },
+      "href": "https://api.spotify.com/v1/tracks/5B9qVIyjqeWkeOAp2tJgqL",
+      "id": "5B9qVIyjqeWkeOAp2tJgqL",
+      "name": "Everybody Wants To Rule The World - Alternative Single Version",
+      "preview_url": "https://p.scdn.co/mp3-preview/940337832c3fb5397834300ddf7738d732d380fb?cid=e44e7b8278114c7db211c00ea273ac69",
+      "track_number": 14,
+      "uri": "spotify:track:5B9qVIyjqeWkeOAp2tJgqL",
+      "type": "track"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "status": "error",
+  "error": {
+    "error_code": 902,
+    "error_message": "Adding a stream stream failed: authorization failed: the limit was reached. (Please check if you have an active subscription for music recognition for audio streams on https://dashboard.audd.io/ or contact us to try it for free: api@audd.io)"
+  },
+  "request_params": {
+    "radio_id": "999001",
+    "api_token": "d***e",
+    "url": "https://npr-ice.streamguys1.com/live.mp3"
+  },
+  "request_api_method": "addStream",
+  "request_http_method": "POST",
+  "see api documentation": "https://docs.audd.io",
+  "contact us": "api@audd.io"
+}
