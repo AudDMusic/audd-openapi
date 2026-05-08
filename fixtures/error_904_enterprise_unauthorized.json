@@ -1,0 +1,15 @@
+{
+  "status": "error",
+  "error": {
+    "error_code": 904,
+    "error_message": "Music Recognition by URL on our enterprise endpoint is only available to paid users. If you're currently subscribed to one of our plans, please double-check the api_token parameter.Otherwise, please send a file by POST instead of the file URL or subscribe to one of our plans."
+  },
+  "requested_params": {
+    "url": "https://audd.tech/example.mp3",
+    "limit": "1",
+    "method": "recognize"
+  },
+  "see api documentation": "https://docs.audd.io",
+  "contact us": "api@audd.io",
+  "execution_time": "1.461903ms"
+}

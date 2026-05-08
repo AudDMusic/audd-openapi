@@ -1,0 +1,6 @@
+extends:
+  - recommended
+rules:
+  # AudD endpoints all require a trailing slash (e.g. /setCallbackUrl/, /findLyrics/)
+  # so the spec must keep them. Disable the lint rule to match the actual contract.
+  no-path-trailing-slash: off
