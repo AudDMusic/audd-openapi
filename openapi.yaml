@@ -697,13 +697,14 @@ paths:
   /:
     post:
       operationId: recognize
-      summary: Identify a song from a short audio clip (≤25 seconds, ≤10 MB).
+      summary: Identify a song from an audio clip (the first 12 seconds are analyzed; ≤10 MB).
       description: |
         Standard music recognition. Send a file directly (multipart) or pass
         a URL the AudD server downloads.
 
-        For audio longer than 25 seconds, see the enterprise endpoint
-        (`POST https://enterprise.audd.io/`).
+        Only the first 12 seconds of the audio are analyzed. To recognize music
+        beyond the first 12 seconds of a file, use the enterprise endpoint
+        (`POST https://enterprise.audd.io/`), which scans the whole file.
       tags: [Recognition]
       servers:
         - url: https://api.audd.io
@@ -1010,8 +1011,8 @@ paths:
       summary: Add a song to the caller's private fingerprint catalog (NOT for music recognition).
       description: |
         ⚠ **This is NOT how you submit audio for music recognition.** For
-        recognition, use `POST /` (or `POST enterprise.audd.io/` for files
-        longer than 25 seconds). This endpoint adds a song to the caller's
+        recognition, use `POST /` (or `POST enterprise.audd.io/` to scan
+        beyond the first 12 seconds of a file). This endpoint adds a song to the caller's
         private fingerprint catalog so AudD can later identify it for the
         caller's account only.
 
