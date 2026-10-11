@@ -8,6 +8,11 @@ info:
     (`api.audd.io/`), large audio/video files (`enterprise.audd.io/`), and
     real-time audio streams (callback or longpoll based on `api.audd.io/`).
 
+    The standard endpoint has no rate limits: requests can be sent in
+    parallel, up to millions per hour. For a large volume, let us know in
+    advance at api@audd.io. The enterprise endpoint has a default limit on
+    concurrent requests per account, which we can raise on request.
+
     This OpenAPI document is the canonical contract for the API. Every
     official AudD SDK validates its parser against the fixtures shipped
     alongside this spec.
