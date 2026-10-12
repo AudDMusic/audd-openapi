@@ -8,6 +8,7 @@ Real captured AudD API responses, used as the source of truth for SDK contract t
 | `recognize_with_metadata.json` | live capture | `POST api.audd.io/` | Standard recognition with `return=apple_music,spotify,deezer,napster,musicbrainz` |
 | `recognize_custom_match.json` | synthesized from design spec | `POST api.audd.io/` | Custom-catalog match shape (only `timecode` + `audio_id`) — can't easily capture live without enterprise custom-catalog access |
 | `enterprise_with_isrc_upc.json` | live capture (enterprise token, `limit=1`) | `POST enterprise.audd.io/` | Enterprise success with ISRC and UPC fields |
+| `enterprise_custom_match.json` | synthesized from design spec | `POST enterprise.audd.io/` | Enterprise custom-catalog match shape (`audio_id`, no public-DB fields) |
 | `error_900_invalid_token.json` | live capture | `POST api.audd.io/` | Invalid api_token |
 | `error_700_no_file.json` | live capture | `POST api.audd.io/` | No file or url sent |
 | `error_19_no_callback_url.json` | live capture | `POST api.audd.io/getCallbackUrl/` | The "no callback URL configured" signal — server returns code 19 (catch-all "Internal error") |

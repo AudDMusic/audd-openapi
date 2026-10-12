@@ -29,6 +29,7 @@ FIXTURE_SCHEMA: dict[str, str] = {
     "error_900_invalid_token.json": "ErrorResponse",
     "error_700_no_file.json": "ErrorResponse",
     "enterprise_with_isrc_upc.json": "EnterpriseSuccessResponse",
+    "enterprise_custom_match.json": "EnterpriseSuccessResponse",
     "error_904_enterprise_unauthorized.json": "ErrorResponse",
     "error_19_no_callback_url.json": "ErrorResponse",
     "error_902_stream_limit.json": "ErrorResponse",

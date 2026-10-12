@@ -1,0 +1,18 @@
+{
+  "status": "success",
+  "result": [
+    {
+      "songs": [
+        {
+          "score": 100,
+          "timecode": "01:45",
+          "audio_id": 146,
+          "start_offset": 0,
+          "end_offset": 11960
+        }
+      ],
+      "offset": "00:24"
+    }
+  ],
+  "execution_time": "143.512004ms"
+}

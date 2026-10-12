@@ -567,11 +567,23 @@ components:
         A single match within a 12-second chunk of an enterprise-uploaded
         file. Multiple matches per chunk indicate competing candidates;
         higher `score` is more confident.
+
+        * Public-DB match — `artist`, `title`, `album`, `release_date`,
+          `label`, `song_link` (and `isrc`/`upc` where available) are
+          populated; `audio_id` is absent.
+        * Custom-DB match (caller's private fingerprint catalog) — `audio_id`
+          is populated; the public-DB fields may be absent.
+
+        The SDKs expose the same `is_custom_match` / `is_public_match`
+        helpers as on the standard result.
       properties:
         score:
           type: integer
           minimum: 0
           maximum: 100
+        audio_id:
+          type: integer
+          description: Custom-DB match identifier (the `audio_id` you uploaded the track under). Mutually exclusive with the public-DB fields in practice.
         artist: { type: string }
         title: { type: string }
         album: { type: string }
@@ -583,10 +595,10 @@ components:
           description: 'Position in the original song (MM:SS) where the matched fragment plays.'
         isrc:
           type: string
-          description: Present only on enterprise-tier accounts.
+          description: Present on Startup plans and higher.
         upc:
           type: string
-          description: Present only on enterprise-tier accounts.
+          description: Present on Startup plans and higher.
         song_link:
           type: string
           format: uri
@@ -1222,6 +1234,9 @@ paths:
               examples:
                 success_with_isrc_upc:
                   externalValue: ./fixtures/enterprise_with_isrc_upc.json
+                custom_match:
+                  summary: Custom-catalog match (audio_id instead of public-DB fields)
+                  externalValue: ./fixtures/enterprise_custom_match.json
                 error_unauthorized:
                   externalValue: ./fixtures/error_904_enterprise_unauthorized.json
             text/csv:
