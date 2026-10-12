@@ -55,6 +55,20 @@ components:
       name: api_token
       description: api_token sent as a query parameter (works on every endpoint).
 
+  responses:
+    NonJsonError:
+      description: |
+        AudD reports API errors with HTTP 200 and a JSON body whose `status`
+        is `error` (see `ErrorResponse`). A non-200 status comes from the
+        network path in front of the API instead: for example 413 when an
+        upload is too large for the proxy, or 502/503/504 when a gateway
+        can't reach the server. The body may be HTML or empty, so don't
+        parse it as JSON. A 5xx after the upload completed may follow
+        metered work on the server; retrying it could bill twice.
+      content:
+        text/html:
+          schema: { type: string }
+
   schemas:
     RecognitionResult:
       type: object
@@ -655,12 +669,15 @@ components:
             error_code:
               type: integer
               description: |
-                AudD-specific numeric error code. The SDK maps each code to a
-                typed exception class (see audd-<lang>/docs/errors.md). The
-                full set: 19, 20, 31337, 40, 50, 51, 100, 300, 400, 500, 600,
-                601, 602, 610, 611, 700, 701, 702, 900, 901, 902, 903, 904,
-                905, 906, 907, 1000.
-              enum: [19, 20, 31337, 40, 50, 51, 100, 300, 400, 500, 600, 601, 602, 610, 611, 700, 701, 702, 900, 901, 902, 903, 904, 905, 906, 907, 1000]
+                AudD-specific numeric error code. Codes in use today: 19, 20,
+                31337, 40, 50, 51, 100, 300, 400, 500, 600, 601, 602, 610, 611,
+                700, 701, 702, 900, 901, 902, 903, 904, 905, 906, 907, 1000.
+                The list is open: the server may add codes, so clients should
+                accept any integer and fall back to a generic API error for
+                codes they don't know. The SDKs group codes into categories
+                (authentication, quota, rate limit, invalid audio, invalid
+                request, blocked, subscription, server).
+              examples: [900, 700, 902]
             error_message:
               type: string
               description: Human-readable, server-provided. Already includes any subscription-nudge appendix.
@@ -681,9 +698,13 @@ components:
         request_api_method:
           type: string
           description: |
-            Humanized echo of the API method (e.g., "Recognition", "Adding a
-            stream stream", "Getting the URL for callbacks"). Informational
-            only — not a programmatic discriminator.
+            Echo of the API method that was called (e.g. `recognize`,
+            `addStream`, `getCallbackUrl`). Informational only; branch on
+            `error.error_code`, not on this field. The human-readable form of
+            the method appears at the start of `error.error_message`
+            ("Recognition failed: …"). Not present on enterprise-endpoint
+            errors, which echo the method inside `requested_params.method`.
+          examples: [recognize, addStream, getCallbackUrl]
         request_http_method:
           type: string
           enum: [GET, POST]
@@ -694,8 +715,8 @@ components:
           type: object
           additionalProperties: true
           description: |
-            For most errors, omitted. For codes 19 and 31337, the server may
-            populate a "branded" result with `artist`/`title` strings — the
+            For most errors, omitted. For codes 19, 903, and 31337, the server
+            may populate a "branded" result with `artist`/`title` strings — the
             SDK surfaces these on the exception's `branded_message` field
             and does NOT expose them as a recognition result.
           properties:
@@ -759,6 +780,8 @@ paths:
                   description: ISO country code for Apple Music / iTunes / Spotify regional results. Default `us`.
                   example: us
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: |
             Recognition processed. The response is a `success` payload (with
@@ -805,6 +828,8 @@ paths:
           name: market
           schema: { type: string }
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: Same shapes as POST.
           content:
@@ -841,6 +866,8 @@ paths:
                     `?return=apple_music,deezer` parameter to receive that
                     metadata in callbacks.
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: Callback URL set or rejected.
           content:
@@ -872,6 +899,8 @@ paths:
               properties:
                 api_token: { type: string }
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: |
             Returns the URL or — when no callback URL has ever been
@@ -917,6 +946,8 @@ paths:
                     Set to `before` to receive callbacks at song start.
                     Default is callbacks at song end (with total play length).
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: Stream added or rejected (e.g., #902 if subscription slots are exhausted).
           content:
@@ -945,6 +976,8 @@ paths:
               properties:
                 api_token: { type: string }
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: Returns the array of configured streams (may be empty).
           content:
@@ -975,6 +1008,8 @@ paths:
                 radio_id: { type: integer }
                 url: { type: string }
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: Stream URL updated or rejected.
           content:
@@ -1007,6 +1042,8 @@ paths:
                 api_token: { type: string }
                 radio_id: { type: integer }
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: Stream deleted or rejected.
           content:
@@ -1062,6 +1099,8 @@ paths:
                   type: string
                   format: binary
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: Catalog updated, or 904 if the caller's token doesn't have access.
           content:
@@ -1100,6 +1139,8 @@ paths:
                   type: string
                   description: Free-text lyrics query.
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: Lyrics search hits or error.
           content:
@@ -1151,6 +1192,8 @@ paths:
           schema: { type: integer }
           description: Server timestamp (ms) returned in the previous response — used to deduplicate events.
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: |
             Either a timeout response (no events) or an event response (one
@@ -1223,6 +1266,8 @@ paths:
                   enum: [json, csv]
                   description: Output format. Default json.
       responses:
+        default:
+          $ref: '#/components/responses/NonJsonError'
         '200':
           description: Recognition processed. JSON or CSV depending on `response_type`.
           content:
