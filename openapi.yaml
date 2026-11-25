@@ -1225,12 +1225,12 @@ paths:
         The request is authorized by the category alone: do not send
         `api_token` with it.
 
-        **Important DX caveat:** when no callback URL is configured for the
-        account (which the server signals via error #19 from `getCallbackUrl`),
-        longpoll silently returns timeout responses forever — events never
-        fire. Every official SDK preflights `getCallbackUrl` and raises a
-        descriptive error if no callback URL is set. The check is bypassable
-        via a `skip_callback_check` flag.
+        When no callback URL is configured for the account (`getCallbackUrl`
+        answers with error #19), longpoll might never return any events
+        despite successful song recognition. The official SDKs call
+        `getCallbackUrl` before the first longpoll request and raise a
+        descriptive error if no callback URL is set; the check can be skipped
+        with a `skip_callback_check` option.
       tags: [Streams]
       parameters:
         - in: query
