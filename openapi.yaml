@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: AudD Music Recognition API
-  version: 1.4.4
+  version: 1.4.5
   description: |
     The AudD music recognition API identifies songs from short audio clips
     (`api.audd.io/`), large audio/video files (`enterprise.audd.io/`), and
@@ -90,7 +90,7 @@ components:
       properties:
         timecode:
           type: string
-          pattern: '^\d{2}:\d{2}$'
+          pattern: '^\d{2,}:\d{2}(:\d{2})?$'
           description: 'Position in the recognized song (MM:SS) at which the matched fragment plays.'
         audio_id:
           type: integer
@@ -106,6 +106,12 @@ components:
           description: 'Date in YYYY-MM-DD format.'
         label:
           type: string
+        isrc:
+          type: string
+          description: An enterprise feature, available on a Startup plan or higher, on request.
+        upc:
+          type: string
+          description: An enterprise feature, available on a Startup plan or higher, on request.
         song_link:
           type: string
           format: uri
@@ -137,6 +143,8 @@ components:
           oneOf:
             - $ref: '#/components/schemas/RecognitionResult'
             - type: 'null'
+        warning:
+          $ref: '#/components/schemas/ResponseWarning'
 
     AppleMusicMetadata:
       type: object
@@ -213,7 +221,11 @@ components:
     NapsterMetadata:
       type: object
       additionalProperties: true
-      description: Mirror of the upstream Napster track payload. May be absent for some tracks.
+      deprecated: true
+      description: |
+        Mirror of the upstream Napster track payload. Deprecated: `napster`
+        is not a valid value of `return`, and a request that sends it gets
+        a `warning` with code 51.
       properties:
         type: { type: string }
         id: { type: string }
@@ -413,7 +425,10 @@ components:
           items:
             type: object
             additionalProperties: true
-            required: [artist, title, score]
+            description: |
+              A public-database match carries `artist`, `title` and the
+              other song fields. A match from the account's custom catalog
+              carries `audio_id` instead.
             properties:
               artist: { type: string }
               title: { type: string }
@@ -421,6 +436,10 @@ components:
               release_date: { type: string }
               label: { type: string }
               score: { type: integer }
+              audio_id: { type: integer }
+              timecode: { type: string }
+              isrc: { type: string }
+              upc: { type: string }
               song_link: { type: string, format: uri }
               apple_music: { $ref: '#/components/schemas/AppleMusicMetadata' }
               spotify: { $ref: '#/components/schemas/SpotifyMetadata' }
@@ -467,7 +486,6 @@ components:
             stream_running: { type: boolean }
             notification_code:
               type: integer
-              enum: [0, 650, 651]
               description: |
                 * 0 — healthy
                 * 650 — can't connect to the stream
@@ -524,6 +542,18 @@ components:
           items:
             $ref: '#/components/schemas/LyricsResult'
 
+    ResponseWarning:
+      type: object
+      additionalProperties: true
+      description: |
+        Sent next to a successful result when the request used a deprecated
+        or unknown parameter (code 51). The request still succeeded.
+      properties:
+        error_code:
+          type: integer
+        error_message:
+          type: string
+
     LongpollTimeoutResponse:
       type: object
       additionalProperties: true
@@ -540,43 +570,61 @@ components:
           type: integer
           description: Server timestamp (ms) — pass as `since_time` on the next request.
 
+    LongpollEvent:
+      type: object
+      additionalProperties: true
+      required: [timestamp, data]
+      description: One event of a longpoll response.
+      properties:
+        timestamp:
+          type: integer
+          description: Server timestamp (ms) of the event. Pass the newest one as `since_time` on the next request.
+        category:
+          type: string
+          description: The longpoll category the event was published to.
+        data:
+          $ref: '#/components/schemas/StreamCallbackPayload'
+
     LongpollEventResponse:
       type: object
       additionalProperties: true
-      required: [timestamp]
+      required: [events]
       description: |
-        Returned when one or more new recognition events fired during the
-        wait. Carries the same per-event shape as a callback payload (either
-        a `StreamCallbackResultBody` under `result`, or a notification block
-        under `notification`) plus a `timestamp` to use as the next
-        `since_time`. Tightening this oneOf during Phase 1 once a real fixture
-        is captured.
+        Returned when one or more events fired during the wait. Each event
+        carries, under `data`, the same payload a callback URL receives (a
+        recognition result or a notification), and its own `timestamp`. Use
+        the `timestamp` of the last event as the next `since_time`.
       properties:
-        result:
-          $ref: '#/components/schemas/StreamCallbackResultBody'
-        notification:
-          type: object
-          additionalProperties: true
-        status:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/LongpollEvent'
+
+    LongpollErrorResponse:
+      type: object
+      additionalProperties: true
+      required: [error]
+      description: |
+        Returned with HTTP 200 when the request itself is invalid, for
+        example a `timeout` outside 1-120 or a missing `category`. Sending
+        the same request again returns the same error.
+      properties:
+        error:
           type: string
-        timestamp:
-          type: integer
 
     LongpollResponse:
-      anyOf:
+      oneOf:
         - $ref: '#/components/schemas/LongpollTimeoutResponse'
         - $ref: '#/components/schemas/LongpollEventResponse'
+        - $ref: '#/components/schemas/LongpollErrorResponse'
       description: |
-        Use `anyOf` rather than `oneOf` because both branches use
-        `additionalProperties: true` and a timeout response (`timeout` +
-        `timestamp`) trivially also satisfies the event-response branch
-        (which only requires `timestamp`). SDKs disambiguate by presence
-        of the `timeout` field.
+        A timeout response (`timeout` + `timestamp`), an event response
+        (`events`), or an error (`error`).
 
     EnterpriseMatch:
       type: object
       additionalProperties: true
-      required: [score, timecode]
+      required: [timecode]
       description: |
         A single match within a 12-second chunk of an enterprise-uploaded
         file. Multiple matches per chunk indicate competing candidates;
@@ -595,6 +643,7 @@ components:
           type: integer
           minimum: 0
           maximum: 100
+          description: An enterprise feature, available on a Startup plan or higher, on request. Absent otherwise.
         audio_id:
           type: integer
           description: Custom-DB match identifier (the `audio_id` you uploaded the track under). Mutually exclusive with the public-DB fields in practice.
@@ -605,14 +654,14 @@ components:
         label: { type: string }
         timecode:
           type: string
-          pattern: '^\d{2}:\d{2}$'
+          pattern: '^\d{2,}:\d{2}(:\d{2})?$'
           description: 'Position in the original song (MM:SS) where the matched fragment plays.'
         isrc:
           type: string
-          description: Present on Startup plans and higher.
+          description: An enterprise feature, available on a Startup plan or higher, on request.
         upc:
           type: string
-          description: Present on Startup plans and higher.
+          description: An enterprise feature, available on a Startup plan or higher, on request.
         song_link:
           type: string
           format: uri
@@ -634,8 +683,8 @@ components:
             $ref: '#/components/schemas/EnterpriseMatch'
         offset:
           type: string
-          pattern: '^\d{2}:\d{2}$'
-          description: Position (MM:SS) in the submitted file at which this 12-second chunk begins.
+          pattern: '^\d{2,}:\d{2}(:\d{2})?$'
+          description: Position (MM:SS, or HH:MM:SS past the first hour) in the submitted file at which this 12-second chunk begins.
 
     EnterpriseSuccessResponse:
       type: object
@@ -773,7 +822,9 @@ paths:
                   type: string
                   description: |
                     Comma-separated metadata identifiers. Valid values:
-                    `apple_music`, `spotify`, `deezer`, `napster`, `musicbrainz`.
+                    `apple_music`, `spotify`, `deezer`, `musicbrainz`. A
+                    deprecated or unknown value is ignored, and the response
+                    carries a `warning` with code 51.
                   example: 'apple_music,spotify'
                 market:
                   type: string
@@ -1165,10 +1216,14 @@ paths:
     get:
       operationId: longpoll
       summary: Long-poll for new recognition events on a category.
+      security: []
       description: |
         Long-polls for new recognition events. The category can be derived
         locally from the api_token + radio_id, or read from the
         `longpoll_category` field of `getStreams`.
+
+        The request is authorized by the category alone: do not send
+        `api_token` with it.
 
         **Important DX caveat:** when no callback URL is configured for the
         account (which the server signals via error #19 from `getCallbackUrl`),
@@ -1185,19 +1240,20 @@ paths:
           description: 9-char longpoll category — `longpoll_category` from `getStreams` or MD5(MD5(api_token)+str(radio_id))[:9].
         - in: query
           name: timeout
-          schema: { type: integer, default: 50, minimum: 1, maximum: 90 }
+          schema: { type: integer, default: 50, minimum: 1, maximum: 120 }
           description: Seconds to wait for events before returning the timeout response.
         - in: query
           name: since_time
           schema: { type: integer }
-          description: Server timestamp (ms) returned in the previous response — used to deduplicate events.
+          description: Server timestamp (ms) from the previous response (the last event's `timestamp`, or the timeout response's). Only newer events are returned.
       responses:
         default:
           $ref: '#/components/responses/NonJsonError'
         '200':
           description: |
-            Either a timeout response (no events) or an event response (one
-            or more new recognitions/notifications).
+            A timeout response (no events), an event response (one or more
+            new recognitions/notifications), or an error for an invalid
+            request.
           content:
             application/json:
               schema:
@@ -1205,6 +1261,10 @@ paths:
               examples:
                 timeout:
                   externalValue: ./fixtures/longpoll_no_events.json
+                events:
+                  externalValue: ./fixtures/longpoll_events.json
+                error:
+                  externalValue: ./fixtures/longpoll_error.json
 
   /enterprise/:
     post:
@@ -1235,8 +1295,8 @@ paths:
                 "return":
                   type: string
                   description: |
-                    Comma-separated metadata identifiers. Same as the standard
-                    endpoint — but **Spotify is NOT supported** on enterprise.
+                    Comma-separated metadata identifiers, as on the standard
+                    endpoint.
                 accurate_offsets:
                   type: string
                   enum: ['true', 'false']

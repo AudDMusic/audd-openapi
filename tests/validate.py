@@ -1,7 +1,7 @@
 """Validate every fixture in fixtures/ against its expected schema in openapi.yaml.
 
 Mapping (fixture-name → schema-name) lives below as FIXTURE_SCHEMA. Add an entry
-for each new fixture as Tasks 5-13 add their schemas.
+for each new fixture.
 
 Usage: python tests/validate.py
 Exits non-zero on any validation failure.
@@ -37,13 +37,9 @@ FIXTURE_SCHEMA: dict[str, str] = {
     "streams_callback_with_result.json": "StreamCallbackPayload",
     "streams_callback_with_notification.json": "StreamCallbackPayload",
     "longpoll_no_events.json": "LongpollResponse",
-    # "error_19_no_callback_url.json": "ErrorResponse",
-    # "error_902_stream_limit.json": "ErrorResponse",
-    # "error_904_enterprise_unauthorized.json": "ErrorResponse",
-    # "getStreams_empty.json": "GetStreamsSuccessResponse",
-    # "longpoll_no_events.json": "LongpollResponse",
-    # "streams_callback_with_result.json": "StreamCallbackPayload",
-    # "streams_callback_with_notification.json": "StreamCallbackPayload",
+    "longpoll_events.json": "LongpollResponse",
+    "longpoll_error.json": "LongpollResponse",
+    "recognize_warning_51.json": "RecognizeSuccessResponse",
 }
 
 

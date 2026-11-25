@@ -4,7 +4,7 @@
 
 The canonical OpenAPI 3.1 specification for the [AudD](https://audd.io) music recognition API.
 
-This repository is the source of truth that all official AudD SDKs build their typed models against. Third parties can also use this spec to generate their own clients.
+This repository is the source of truth that all official AudD SDKs build their typed models against.
 
 | File | Purpose |
 |---|---|
@@ -40,13 +40,9 @@ AUDD_TEST_TOKEN_STD=... AUDD_TEST_TOKEN_ENTERPRISE=... \
 python tests/scrub_fixtures.py
 ```
 
-## Generate a client
-
-This spec is hand-written and validates against real fixtures. You can use it with any OpenAPI-compatible code generator. Note that AudD's official SDKs are hand-written rather than generated — to maximize idiomatic feel in each language — but they validate against this same spec.
-
 ## Contract drift detection
 
-When this repo lands a change to `openapi.yaml` or `fixtures/`, a workflow fires `repository_dispatch` events at the nine SDK repos that have a separate contract workflow (audd-python, audd-node, audd-go, audd-rust, audd-php, audd-swift, audd-kotlin, audd-dotnet, audd-java) to re-run their contract tests against the new spec. Those nine SDKs also run the same contract tests on a daily cron at 06:00 UTC as a safety net. The audd-c and audd-cpp SDKs validate their parsers against fixtures inside their main CI build instead.
+When this repo lands a change to `openapi.yaml` or `fixtures/`, a workflow fires `repository_dispatch` events at the nine SDK repos that have a separate contract workflow (audd-python, audd-node, audd-go, audd-rust, audd-php, audd-swift, audd-kotlin, audd-dotnet, audd-java) to re-run their contract tests against the new spec. Those nine SDKs also run the same contract tests on a daily cron at 06:00 UTC as a safety net.
 
 ## License
 

@@ -6,6 +6,7 @@ Real captured AudD API responses, used as the source of truth for SDK contract t
 |---|---|---|---|
 | `recognize_basic.json` | live capture | `POST api.audd.io/` | Standard recognition without metadata |
 | `recognize_with_metadata.json` | live capture | `POST api.audd.io/` | Standard recognition with `return=apple_music,spotify,deezer,napster,musicbrainz` |
+| `recognize_warning_51.json` | live capture | `POST api.audd.io/` | Success with a `warning` (code 51): the request sent a deprecated `return` value |
 | `recognize_custom_match.json` | synthesized from design spec | `POST api.audd.io/` | Custom-catalog match shape (only `timecode` + `audio_id`) — can't easily capture live without enterprise custom-catalog access |
 | `enterprise_with_isrc_upc.json` | live capture (enterprise token, `limit=1`) | `POST enterprise.audd.io/` | Enterprise success with ISRC and UPC fields |
 | `enterprise_custom_match.json` | synthesized from design spec | `POST enterprise.audd.io/` | Enterprise custom-catalog match shape (`audio_id`, no public-DB fields) |
@@ -16,6 +17,8 @@ Real captured AudD API responses, used as the source of truth for SDK contract t
 | `error_904_enterprise_unauthorized.json` | live capture | `POST enterprise.audd.io/` | Standard token denied at enterprise endpoint |
 | `getStreams_empty.json` | live capture | `POST api.audd.io/getStreams/` | Empty stream list |
 | `longpoll_no_events.json` | live capture | `GET api.audd.io/longpoll/` | Longpoll timeout response (no new events) |
+| `longpoll_events.json` | synthesized from the response format | `GET api.audd.io/longpoll/` | Longpoll event response: an `events` list, each event with its `timestamp`, the `category`, and the callback payload under `data` |
+| `longpoll_error.json` | live capture | `GET api.audd.io/longpoll/` | Invalid request (`timeout` outside 1-120), returned with HTTP 200 |
 | `streams_callback_with_result.json` | from docs.audd.io/streams.md | callback POSTed by AudD to user webhook | Recognition-result variant of the callback payload |
 | `streams_callback_with_notification.json` | from docs.audd.io/streams.md | callback POSTed by AudD to user webhook | Notification variant (stream connectivity) |
 

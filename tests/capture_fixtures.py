@@ -66,7 +66,7 @@ def main() -> int:
         }, "standard_token"),
         "recognize_with_metadata": ("POST", "https://api.audd.io/", {
             "url": EXAMPLE_MP3,
-            "return": "apple_music,spotify,deezer,napster,musicbrainz",
+            "return": "apple_music,spotify,deezer,musicbrainz",
             "api_token": tok_std,
         }, "standard_token"),
         "error_900_invalid_token": ("POST", "https://api.audd.io/", {
